@@ -4,6 +4,8 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour
 {
     [SerializeField] private float moveSpeed = 5f;
+    [SerializeField] private float baseSpeed = 5f;
+    private PlayerCrouch crouchController;
 
     private CharacterController controller;
     private Vector3 moveInput;
@@ -18,10 +20,26 @@ public class PlayerMovement : MonoBehaviour
     private void Awake()
     {
         controller = GetComponent<CharacterController>();
+        controller = GetComponent<CharacterController>();
+        crouchController = GetComponent<PlayerCrouch>();
     }
 
     public void Move()
     {
         controller.Move(moveInput * moveSpeed * Time.deltaTime);
+    }
+    
+    private void Update()
+    {
+        float horizontal = Input.GetAxis("Horizontal");
+        float vertical = Input.GetAxis("Vertical");
+
+        Vector3 move = transform.right * horizontal + transform.forward * vertical;
+        float currentSpeed = baseSpeed;
+
+        if (crouchController != null)
+            currentSpeed = crouchController.GetCurrentSpeedMultiplier();
+
+        controller.Move(move * currentSpeed * Time.deltaTime);
     }
 }
